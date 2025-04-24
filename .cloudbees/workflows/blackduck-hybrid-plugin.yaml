@@ -1,0 +1,28 @@
+name: blackduck-hybrid-plugin
+kind: workflow
+apiVersion: automation.cloudbees.io/v1alpha1
+on:
+  push:
+    branches:
+      - blackduck-hybrid-plugin-test
+  workflow_dispatch:
+  schedule:
+    - cron: 0 * * * 1-5
+permissions:
+  scm-token-own: read
+  scm-token-org: read
+  id-token: write
+jobs:
+  blackduck-hybrid-scan:
+    steps:
+      - name: checkout Source Code
+        uses: cloudbees-io/checkout@v1
+      - name: black duck hybrid plugin scan
+        uses: cloudbees-io/blackduck-sca-scan-dependency@v2.0.1
+        with:
+          server-url: https://blackduck.saas-qa.beescloud.com
+          api-token: ${{ secrets.BD_API_TOKEN }}
+          project-name: BlackDuck-Cleancodebase-sonarqube
+          project-version: 0.0.1
+          detect-cli-params: --logging.level.detect=DEBUG --blackduck.offline.mode=false
+          ref: main
